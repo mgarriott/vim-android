@@ -21,6 +21,19 @@ function! s:callAndroid(...)
   return output
 endfunction
 
+function! s:callAnt(...)
+  let makeprg = &makeprg
+  let &makeprg = 'ant ' . join(a:000)
+
+  let errorformat = &errorformat
+  set errorformat=%A\ %#[javac]\ %f:%l:\ %m,%-Z\ %#[javac]\ %p^,%-C%.%#
+
+  make
+
+  let &makeprg = makeprg
+  let &errorformat = errorformat
+endfunction
+
 function! s:listTargets()
   let output = s:callAndroid('list', 'targets')
 
@@ -32,10 +45,6 @@ function! s:listTargets()
   call s:fillBuffer('temp', join(list, "\n"))
 endfunction
 
-function! s:build(type)
-  execute '!ant ' . a:type
-endfunction
-
 " Set up our the path for find.
 
 " Remove /usr/include we won't need it.
@@ -43,5 +52,5 @@ set path-=/usr/include
 " Add source and res directories
 set path+=src/**/*,res/**/*
 
-command! Abuild call s:build('debug')
+command! Adebug call s:callAnt('debug')
 command! Alisttargets call s:listTargets()
