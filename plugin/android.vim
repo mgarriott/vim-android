@@ -1,3 +1,18 @@
+function! s:fillBuffer(buf_name, text)
+  let temp_o = @o
+  let @o = a:text
+
+  execute 'split ' . a:buf_name
+
+  setlocal modifiable noreadonly
+  " Delete anything that may be in the buffer
+  silent %delete
+  silent 0put o
+
+  setlocal nomodifiable readonly nomodified bufhidden=delete
+  let @o = temp_o
+endfunction
+
 function! s:callAndroid(...)
   redir => output
     execute 'silent !android ' . join(a:000, ' ')
@@ -7,23 +22,14 @@ function! s:callAndroid(...)
 endfunction
 
 function! s:listTargets()
-  let temp_o = @o
-  let @o = s:callAndroid('list', 'targets')
+  let output = s:callAndroid('list', 'targets')
 
-  pedit temp
-  wincmd j
+  let list = split(output, "\<enter>\n")
+  let g:test_list = list
 
-  let @o = substitute(@o, "\<enter>", '', 'g')
-
-  setlocal modifiable noreadonly
-  " Delete anything that may be in the buffer
-  silent %delete
-  silent put o
-
-  " The top three lines of the register are garbage.
-  silent 0,3delete
-  setlocal nomodifiable readonly nomodified
-  let @o = temp_o
+  " The top line here is garbage.
+  call remove(list, 0)
+  call s:fillBuffer('temp', join(list, "\n"))
 endfunction
 
 function! s:build(type)
