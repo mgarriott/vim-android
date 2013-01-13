@@ -68,14 +68,18 @@ function! s:gotoAndroid() abort
     let dir = finddir(type, res_dir)
     if dir == ''
       " Directory not found, let's check in values.
-      let file = findfile(type.'s.xml', res_dir.'/values')
-      " TODO: move cursor to correct location
-    else
-      let file = findfile(name.'.xml', dir)
-    endif
+      let file = findfile(type . 's.xml', res_dir . '/values')
 
-    if file != ''
-      execute 'edit ' . file
+      if file != ''
+        execute 'edit ' . file
+        call search('\vname\=("|'')' . name . '("|'')[^>]*\>.', 'we')
+      endif
+    else
+      let file = findfile(name . '.xml', dir)
+
+      if file != ''
+        execute 'edit ' . file
+      endif
     endif
 
   else
