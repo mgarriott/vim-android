@@ -1,3 +1,7 @@
+
+let s:project_root = getcwd()
+
+" {{{ Utils
 function! s:fillBuffer(buf_name, text)
   let temp_o = @o
   let @o = a:text
@@ -12,7 +16,8 @@ function! s:fillBuffer(buf_name, text)
   setlocal nomodifiable readonly nomodified bufhidden=delete
   let @o = temp_o
 endfunction
-
+" }}}
+" {{{ External Commands (android, ant, etc.)
 function! s:callAndroid(...)
   redir => output
     execute 'silent !android ' . join(a:000, ' ')
@@ -38,11 +43,50 @@ function! s:listTargets()
   let output = s:callAndroid('list', 'targets')
 
   let list = split(output, "\<enter>\n")
-  let g:test_list = list
 
   " The top line here is garbage.
   call remove(list, 0)
   call s:fillBuffer('temp', join(list, "\n"))
+endfunction
+" }}}
+" {{{ Navigation
+function! s:gotoAndroid() abort
+
+  let line = getline(line('.'))
+  let resource_pattern = '\vR\.([^.]+)\.(\w+)'
+  let start = match(line, resource_pattern)
+  let end = matchend(line, resource_pattern)
+
+  let col = col('.')
+  if col > start && col <= end
+    let matches = matchlist(line, resource_pattern)
+    let type = matches[1]
+    let name = matches[2]
+
+    let res_dir = s:project_root . '/res'
+
+    let dir = finddir(type, res_dir)
+    if dir == ''
+      " Directory not found, let's check in values.
+      let file = findfile(type.'s.xml', res_dir.'/values')
+      " TODO: move cursor to correct location
+    else
+      let file = findfile(name.'.xml', dir)
+    endif
+
+    if file != ''
+      execute 'edit ' . file
+    endif
+
+  else
+    " Item doesn't appear to be a resource pass the call onto tags.
+    try
+      normal! 
+    catch /E426/
+      echohl ErrorMsg | echom v:errmsg | echohl None
+    endtry
+  endif
+
 endfunction
 
 " Set up our the path for find.
@@ -51,6 +95,9 @@ endfunction
 set path-=/usr/include
 " Add source and res directories
 set path+=src/**/*,res/**/*
+" }}}
 
 command! Adebug call s:callAnt('debug')
 command! Alisttargets call s:listTargets()
+
+command! Agoto call s:gotoAndroid()
