@@ -52,7 +52,7 @@ Alisttargets              List all available android platform targets.
 
 NAVIGATION-COMMANDS                              *android-navigation-commands*
 
-                                                 *Alisttargets*
+                                                 *Agoto*
 Agoto                     Tag-like navigation, but this command also allows
                           you to easily navigate to resources from within the
                           source code. Recommended mapping: <C-]>.
