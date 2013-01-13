@@ -1,6 +1,7 @@
 *android.txt*  Assisting android development with VIM.
 
 Author:  Matt Garriott <https://github.com/mgarriott>
+License: BSD 2-Clause (see LICENSE file).
 
 INTRODUCTION                                     *android*
 
