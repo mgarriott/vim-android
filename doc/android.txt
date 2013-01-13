@@ -1,0 +1,59 @@
+*android.txt*  Assisting android development with VIM.
+
+Author:  Matt Garriott <https://github.com/mgarriott>
+
+INTRODUCTION                                     *android*
+
+This plugin provides several convenience commands to make development for
+android easier with VIM.
+
+BUILD-COMMANDS                                   *android-build-commands*
+
+The following is a list of Ex commands specific to build operations. These
+commands closely resemble their ant equivalents.
+
+                                                 *Adebug*
+Adebug                    Build the debug version of the current project.
+                          Equivalent to calling `ant debug`
+
+                                                 *Arelease*
+Arelease                  Build the release version of the current project.
+                          Equivalent to calling `ant release`
+
+                                                 *Adebugi*
+Adebugi                   Install the debug APK (must already be built).
+                          Equivalent to calling `ant debugi`
+
+                                                 *Areleasei*
+Areleasei                 Install the release APK (must already be built).
+                          Equivalent to calling `ant release`
+
+                                                 *Adebugbi*
+Adebugbi                  Build and install the debug APK.
+                          Equivalent to calling `ant debug install`
+
+                                                 *Areleasebi*
+Areleasebi                Build and install the release APK.
+                          Equivalent to calling `ant release install`
+
+                                                 *Aclean*
+Aclean                    Clean the project.
+                          Equivalent to calling `ant clean`
+
+ANDROID-COMMANDS                                 *android-commands*
+
+The following is a list of Ex commands that wrap the functionality of the
+"android" executable found in the android platform-tools.
+
+                                                 *Alisttargets*
+Alisttargets              List all available android platform targets.
+                          Equivalent to calling `android list targets`
+
+NAVIGATION-COMMANDS                              *android-navigation-commands*
+
+                                                 *Alisttargets*
+Agoto                     Tag-like navigation, but this command also allows
+                          you to easily navigate to resources from within the
+                          source code. Recommended mapping: <C-]>.
+
+ vim:tw=78:et:ft=help:norl:
