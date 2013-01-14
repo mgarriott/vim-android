@@ -21,20 +21,20 @@ Adebug                    Build the debug version of the current project.
 Arelease                  Build the release version of the current project.
                           Equivalent to calling `ant release`
 
+                                                 *:Ainstalld*
+Ainstalld                 Install the debug APK (must already be built).
+                          Equivalent to calling `ant installd`
+
+                                                 *:Ainstallr*
+Ainstallr                 Install the release APK (must already be built).
+                          Equivalent to calling `ant installr`
+
                                                  *:Adebugi*
-Adebugi                   Install the debug APK (must already be built).
-                          Equivalent to calling `ant debugi`
-
-                                                 *:Areleasei*
-Areleasei                 Install the release APK (must already be built).
-                          Equivalent to calling `ant release`
-
-                                                 *:Adebugbi*
-Adebugbi                  Build and install the debug APK.
+Adebugi                   Build and install the debug APK.
                           Equivalent to calling `ant debug install`
 
-                                                 *:Areleasebi*
-Areleasebi                Build and install the release APK.
+                                                 *:Areleasei*
+Areleasei                 Build and install the release APK.
                           Equivalent to calling `ant release install`
 
                                                  *:Aclean*

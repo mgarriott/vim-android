@@ -103,10 +103,10 @@ set path+=src/**/*,res/**/*
 
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
-command! Adebugi call s:callAnt('debugi')
-command! Areleasei call s:callAnt('releasei')
-command! Adebugbi call s:callAnt('debug install')
-command! Areleasebi call s:callAnt('release install')
+command! Ainstalld call s:callAnt('installd')
+command! Ainstallr call s:callAnt('installr')
+command! Adebugi call s:callAnt('debug install')
+command! Areleasei call s:callAnt('release install')
 command! Aclean call s:callAnt('clean')
 
 command! Alisttargets call s:listTargets()
