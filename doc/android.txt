@@ -41,6 +41,13 @@ Areleasei                 Build and install the release APK.
 Aclean                    Clean the project.
                           Equivalent to calling `ant clean`
 
+                                                 *:Atest*
+Atest                     Run the unit tests for the current project.
+                          The test project directory must be a direct
+                          subdirectory inside the project to test, and
+                          must contain a build.xml file.
+                          Equivalent to calling `ant debug install test`
+
 ANDROID-COMMANDS                                 *android-commands*
 
 The following is a list of Ex commands that wrap the functionality of the

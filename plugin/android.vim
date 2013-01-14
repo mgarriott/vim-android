@@ -16,6 +16,14 @@ function! s:fillBuffer(buf_name, text)
   setlocal nomodifiable readonly nomodified bufhidden=delete
   let @o = temp_o
 endfunction
+
+" Search subdirectories for a test project. Return the test project
+" root directory if found.
+function! s:getTestBuildFile()
+  " We make the assumption here that if a subdirectory contains
+  " a build.xml file that it is the test project for our current project.
+  return findfile('build.xml', s:project_root . '/*')
+endfunction
 " }}}
 " {{{ External Commands (android, ant, etc.)
 function! s:callAndroid(...)
@@ -47,6 +55,10 @@ function! s:listTargets()
   " The top line here is garbage.
   call remove(list, 0)
   call s:fillBuffer('temp', join(list, "\n"))
+endfunction
+
+function! s:runTests()
+  call s:callAnt('debug', 'install', 'test', '-f', s:getTestBuildFile())
 endfunction
 " }}}
 " {{{ Navigation
@@ -93,6 +105,7 @@ function! s:gotoAndroid() abort
 
 endfunction
 
+" TODO: Only set the path if we are in an android project.
 " Set up our the path for find.
 
 " Remove /usr/include we won't need it.
@@ -108,6 +121,7 @@ command! Ainstallr call s:callAnt('installr')
 command! Adebugi call s:callAnt('debug install')
 command! Areleasei call s:callAnt('release install')
 command! Aclean call s:callAnt('clean')
+command! Atest call s:runTests()
 
 command! Alisttargets call s:listTargets()
 
