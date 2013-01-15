@@ -1,6 +1,4 @@
 
-let s:project_root = getcwd()
-
 " {{{ Utils
 function! s:fillBuffer(buf_name, text)
   let temp_o = @o
@@ -22,7 +20,37 @@ endfunction
 function! s:getTestBuildFile()
   " We make the assumption here that if a subdirectory contains
   " a build.xml file that it is the test project for our current project.
-  return findfile('build.xml', s:project_root . '/*')
+  let build_file = findfile('build.xml', s:getProjectRoot() . '/*')
+
+  if build_file != ''
+    if s:isTestDirectory(fnamemodify(build_file, ':h'))
+      return build_file
+    else
+      return ''
+    endif
+  endif
+
+  return build_file
+endfunction
+
+function! s:getProjectRoot()
+  return getcwd()
+endfunction
+
+function! s:isTestDirectory(directory)
+  let ant_properties = findfile('ant.properties', fnamemodify(a:directory, ':p'))
+  if ant_properties != ''
+    let lines = readfile(ant_properties)
+    for line in lines
+      if line =~# '^tested\.project\.dir='
+        return 1
+      endif
+    endfor
+
+    return 0
+  else
+    return 0
+  endif
 endfunction
 " }}}
 " {{{ External Commands (android, ant, etc.)
@@ -58,7 +86,13 @@ function! s:listTargets()
 endfunction
 
 function! s:runTests()
-  call s:callAnt('debug', 'install', 'test', '-f', s:getTestBuildFile())
+  let build_file = s:getTestBuildFile()
+  if build_file == ''
+    echo 'Test project not found. Is it located in a subdirectory of your main project?'
+    return
+  endif
+
+  call s:callAnt('debug', 'install', 'test', '-f', build_file)
 endfunction
 " }}}
 " {{{ Navigation
@@ -75,7 +109,7 @@ function! s:gotoAndroid() abort
     let type = matches[1]
     let name = matches[2]
 
-    let res_dir = s:project_root . '/res'
+    let res_dir = s:getProjectRoot() . '/res'
 
     let dir = finddir(type, res_dir)
     if dir == ''
