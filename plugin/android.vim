@@ -33,8 +33,21 @@ function! s:getTestBuildFile()
   return build_file
 endfunction
 
+" Search upwards from the current working directory and find
+" the highest parent directory containing a project.properties.
+" We assume this is the project root directory.
 function! s:getProjectRoot()
-  return getcwd()
+  let file = findfile('project.properties', getcwd() . '/.;')
+  let dir = fnamemodify(file, ':p:h')
+
+  while file != ''
+    let file = findfile('project.properties', fnamemodify(dir, ':h') . '/.;')
+    if file != ''
+      let dir = fnamemodify(file, ':p:h')
+    endif
+  endwhile
+
+  return dir
 endfunction
 
 function! s:isTestDirectory(directory)
