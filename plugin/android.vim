@@ -152,15 +152,22 @@ function! s:gotoAndroid() abort
 
 endfunction
 
-" TODO: Only set the path if we are in an android project.
-" Set up our the path for find.
+function! s:find(argLead, cmdLine, cursorPos)
+  let path = '.,src/**/*,res/**/*'
 
-" Remove /usr/include we won't need it.
-set path-=/usr/include
-" Add source and res directories
-set path+=src/**/*,res/**/*
+  let raw_list = split(globpath(path, a:argLead . '*'), "\n")
+  let files = []
+  for item in raw_list
+    if !isdirectory(item)
+      call add(files, item)
+    endif
+  endfor
+
+  return files
+endfunction
 " }}}
 
+command! -nargs=1 -bang -complete=customlist,s:find Afind edit<bang> <args>
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
 command! Ainstalld call s:callAnt('installd')
