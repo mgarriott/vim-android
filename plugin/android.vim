@@ -17,20 +17,22 @@ endfunction
 
 " Search subdirectories for a test project. Return the test project
 " root directory if found.
-function! s:getTestBuildFile()
-  " We make the assumption here that if a subdirectory contains
-  " a build.xml file that it is the test project for our current project.
-  let build_file = findfile('build.xml', s:getProjectRoot() . '/*')
+function! s:getTestDir()
+  " We make the assumption here that if a subdirectory contains a
+  " project.properties file that it is the test project for our current
+  " project.
+  let props = findfile('project.properties', s:getProjectRoot() . '/*')
 
-  if build_file != ''
-    if s:isTestDirectory(fnamemodify(build_file, ':h'))
-      return build_file
+  if props != ''
+    let dir = fnamemodify(props, ':h')
+    if s:isTestDirectory(dir)
+      return dir
     else
       return ''
     endif
   endif
 
-  return build_file
+  return ''
 endfunction
 
 " Search upwards from the current working directory and find
@@ -99,7 +101,7 @@ function! s:listTargets()
 endfunction
 
 function! s:runTests()
-  let build_file = s:getTestBuildFile()
+  let build_file = s:getTestDir() . '/build.xml'
   if build_file == ''
     echo 'Test project not found. Is it located in a subdirectory of your main project?'
     return
@@ -156,6 +158,11 @@ function! s:mainFind(argLead, cmdLine, cursorPos)
   return s:find(a:argLead, a:cmdLine, a:cursorPos, s:getProjectRoot())
 endfunction
 
+function! s:testFind(argLead, cmdLine, cursorPos)
+  return s:find(a:argLead, a:cmdLine, a:cursorPos, s:getTestDir())
+endfunction
+
+
 function! s:find(argLead, cmdLine, cursorPos, root)
   let path = a:root.','.a:root.'/src/**/*,'.a:root.'/res/**/*'
 
@@ -163,7 +170,7 @@ function! s:find(argLead, cmdLine, cursorPos, root)
   let files = []
   for item in raw_list
     if !isdirectory(item)
-      let item = substitute(item, a:root, '', '')
+      let item = substitute(item, a:root.'/', '', '')
       call add(files, item)
     endif
   endfor
@@ -173,6 +180,7 @@ endfunction
 " }}}
 
 command! -nargs=1 -bang -complete=customlist,s:mainFind Afind edit<bang> <args>
+command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind edit<bang> <args>
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
 command! Ainstalld call s:callAnt('installd')
