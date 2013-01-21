@@ -152,13 +152,18 @@ function! s:gotoAndroid() abort
 
 endfunction
 
-function! s:find(argLead, cmdLine, cursorPos)
-  let path = '.,src/**/*,res/**/*'
+function! s:mainFind(argLead, cmdLine, cursorPos)
+  return s:find(a:argLead, a:cmdLine, a:cursorPos, s:getProjectRoot())
+endfunction
+
+function! s:find(argLead, cmdLine, cursorPos, root)
+  let path = a:root.','.a:root.'/src/**/*,'.a:root.'/res/**/*'
 
   let raw_list = split(globpath(path, a:argLead . '*'), "\n")
   let files = []
   for item in raw_list
     if !isdirectory(item)
+      let item = substitute(item, a:root, '', '')
       call add(files, item)
     endif
   endfor
@@ -167,7 +172,7 @@ function! s:find(argLead, cmdLine, cursorPos)
 endfunction
 " }}}
 
-command! -nargs=1 -bang -complete=customlist,s:find Afind edit<bang> <args>
+command! -nargs=1 -bang -complete=customlist,s:mainFind Afind edit<bang> <args>
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
 command! Ainstalld call s:callAnt('installd')
