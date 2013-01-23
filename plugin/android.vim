@@ -98,7 +98,12 @@ endfunction
 
 function! s:callAnt(...)
   let makeprg = &makeprg
+
   let &makeprg = 'ant ' . join(a:000)
+
+  if index(a:000, '-f') == -1
+    let &makeprg .= ' -f ' . s:getProjectRoot() . '/build.xml'
+  endif
 
   let errorformat = &errorformat
   set errorformat=%A\ %#[javac]\ %f:%l:\ %m,%-Z\ %#[javac]\ %p^,%-C%.%#
@@ -230,6 +235,7 @@ command! Adebugi call s:callAnt('debug install')
 command! Areleasei call s:callAnt('release install')
 command! Aclean call s:callAnt('clean')
 command! Atest call s:runTests()
+command! Auninstall call s:callAnt('uninstall')
 
 command! Alisttargets call s:listTargets()
 
