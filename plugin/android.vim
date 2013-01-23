@@ -236,6 +236,7 @@ command! Areleasei call s:callAnt('release install')
 command! Aclean call s:callAnt('clean')
 command! Atest call s:runTests()
 command! Auninstall call s:callAnt('uninstall')
+command! -nargs=+ Aant call s:callAnt(<f-args>)
 
 command! Alisttargets call s:listTargets()
 
