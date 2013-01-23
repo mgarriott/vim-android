@@ -15,6 +15,25 @@ function! s:fillBuffer(buf_name, text)
   let @o = temp_o
 endfunction
 
+" Parse the project.properties file to locate any test projects.
+" return the directories found.
+function! s:getLibDir()
+  let root = s:getProjectRoot()
+  let lines = readfile(root . '/project.properties')
+
+  let ref_line_start = 'android\.library\.reference\.\d\+='
+
+  let libraries = []
+  for line in lines
+    if line =~# ref_line_start
+      let dir = strpart(line, matchend(line, ref_line_start))
+      call add(libraries, simplify(root . '/' . dir))
+    endif
+  endfor
+
+  return libraries
+endfunction
+
 " Search subdirectories for a test project. Return the test project
 " root directory if found.
 function! s:getTestDir()
@@ -162,15 +181,23 @@ function! s:testFind(argLead, cmdLine, cursorPos)
   return s:find(a:argLead, a:cmdLine, a:cursorPos, s:getTestDir())
 endfunction
 
+function! s:libFind(argLead, cmdLine, cursorPos)
+  let files = []
+  for dir in s:getLibDir()
+    call extend(files, s:find(a:argLead, a:cmdLine, a:cursorPos, dir))
+  endfor
+  return files
+endfunction
 
 function! s:find(argLead, cmdLine, cursorPos, root)
   let path = a:root.','.a:root.'/src/**/*,'.a:root.'/res/**/*'
 
+  " TODO: Ignore image files and such
   let raw_list = split(globpath(path, a:argLead . '*'), "\n")
   let files = []
   for item in raw_list
     if !isdirectory(item)
-      let item = substitute(item, a:root.'/', '', '')
+      let item = fnamemodify(item, ':.')
       call add(files, item)
     endif
   endfor
@@ -181,6 +208,8 @@ endfunction
 
 command! -nargs=1 -bang -complete=customlist,s:mainFind Afind edit<bang> <args>
 command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind edit<bang> <args>
+command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind edit<bang> <args>
+
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
 command! Ainstalld call s:callAnt('installd')
