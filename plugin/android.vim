@@ -197,11 +197,13 @@ endfunction
 function! s:find(argLead, cmdLine, cursorPos, root)
   let path = a:root.','.a:root.'/src/**/*,'.a:root.'/res/**/*'
 
-  " TODO: Ignore image files and such
+  let ignore_exts = ['png', 'jpg', 'gif', 'ico', 'db', 'apk']
+
   let raw_list = split(globpath(path, a:argLead . '*'), "\n")
   let files = []
   for item in raw_list
-    if !isdirectory(item)
+    let extension = tolower(fnamemodify(item, ':e'))
+    if !isdirectory(item) && index(ignore_exts, extension) == -1
       let item = fnamemodify(item, ':.')
       call add(files, item)
     endif
