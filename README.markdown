@@ -12,10 +12,9 @@ Under Construction
 Android.vim is still in its infancy. That being said there is not much in the
 way of helpful error messages. Here are some gotchas to watch out for:
 
-- At the moment Many of the features are dependant on the current working
-  directory being the root of your project. All the ant tasks and code
-  navigation helpers fall into this category. I intend to make these commands
-  much smarter in the future.
+- Android.vim expects that your current working directory is the root of an
+  android project. If this is not the case many of the commands will not be
+  available.
 
 - You must have the android platform-tools installed and added to your PATH
   variable. Specifically adb, ant, and the android executable. Many of
@@ -35,7 +34,7 @@ feeling really enthusiastic a pull request :). Thanks!
 Installation
 ------------
 
-The easiest installation method is Tim Pope's
+The easiest installation method is using Tim Pope's excellent
 [pathogen.vim](https://github.com/tpope/vim-pathogen), simply copy
 and paste the following into your terminal:
 
