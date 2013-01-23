@@ -210,6 +210,18 @@ command! -nargs=1 -bang -complete=customlist,s:mainFind Afind edit<bang> <args>
 command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind edit<bang> <args>
 command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind edit<bang> <args>
 
+command! -nargs=1 -bang -complete=customlist,s:mainFind AVfind vsplit <args>
+command! -nargs=1 -bang -complete=customlist,s:testFind AVtestfind vsplit <args>
+command! -nargs=1 -bang -complete=customlist,s:libFind AVlibfind vsplit <args>
+
+command! -nargs=1 -bang -complete=customlist,s:mainFind ASfind split <args>
+command! -nargs=1 -bang -complete=customlist,s:testFind AStestfind split <args>
+command! -nargs=1 -bang -complete=customlist,s:libFind ASlibfind split <args>
+
+command! -nargs=1 -bang -complete=customlist,s:mainFind ATfind tabedit <args>
+command! -nargs=1 -bang -complete=customlist,s:testFind ATtestfind tabedit <args>
+command! -nargs=1 -bang -complete=customlist,s:libFind ATlibfind tabedit <args>
+
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
 command! Ainstalld call s:callAnt('installd')
