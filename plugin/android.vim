@@ -191,6 +191,10 @@ function! s:libFind(argLead, cmdLine, cursorPos)
   for dir in s:getLibDir()
     call extend(files, s:find(a:argLead, a:cmdLine, a:cursorPos, dir))
   endfor
+
+  " Remove duplicate list entries
+  call filter(files, 'count(files, v:val) < 2')
+
   return files
 endfunction
 
@@ -203,19 +207,40 @@ function! s:find(argLead, cmdLine, cursorPos, root)
   let files = []
   for item in raw_list
     let extension = tolower(fnamemodify(item, ':e'))
-    if !isdirectory(item) && index(ignore_exts, extension) == -1
-      let item = fnamemodify(item, ':.')
-      call add(files, item)
+    let file = fnamemodify(item, ':t')
+    let not_ignored = index(ignore_exts, extension) == -1
+    let not_listed = index(files, file) == -1
+
+    if !isdirectory(item) && not_ignored && not_listed
+      call add(files, file)
     endif
   endfor
 
   return files
 endfunction
+
+" Find a file in any referenced library projects. If multiple
+" files match the name provided the user will be prompted to
+" choose which file to open.
+function! s:libEdit(file)
+  let files = []
+  for dir in s:getLibDir()
+    call extend(files, findfile(a:file, dir . '/**/*', -1))
+  endfor
+
+  if len(files) == 1
+    execute 'edit ' . files[0]
+  else
+    " Multiple files match. Prompt for file to use.
+    let choice = inputlist(map(copy(files), 'index(files, v:val) + 1.". ".v:val'))
+    execute 'edit ' . files[choice - 1]
+  endif
+endfunction
 " }}}
 
 command! -nargs=1 -bang -complete=customlist,s:mainFind Afind edit<bang> <args>
 command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind edit<bang> <args>
-command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind edit<bang> <args>
+command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind call s:libEdit(<f-args>)
 
 command! -nargs=1 -bang -complete=customlist,s:mainFind AVfind vsplit <args>
 command! -nargs=1 -bang -complete=customlist,s:testFind AVtestfind vsplit <args>
