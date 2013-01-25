@@ -222,25 +222,32 @@ endfunction
 " Find a file in any referenced library projects. If multiple
 " files match the name provided the user will be prompted to
 " choose which file to open.
-function! s:libEdit(file)
+function! s:edit(file, dir)
   let files = []
-  for dir in s:getLibDir()
-    call extend(files, findfile(a:file, dir . '/**/*', -1))
-  endfor
+
+  if type(a:dir) == 3 " dir is a list
+    for d in a:dir
+      call extend(files, findfile(a:file, d . '/**/*', -1))
+    endfor
+  else
+    let files = findfile(a:file, a:dir . '/**/*', -1)
+  endif
 
   if len(files) == 1
     execute 'edit ' . files[0]
   else
     " Multiple files match. Prompt for file to use.
     let choice = inputlist(map(copy(files), 'index(files, v:val) + 1.". ".v:val'))
-    execute 'edit ' . files[choice - 1]
+    if choice != ''
+      execute 'edit ' . files[choice - 1]
+    endif
   endif
 endfunction
 " }}}
 
-command! -nargs=1 -bang -complete=customlist,s:mainFind Afind edit<bang> <args>
-command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind edit<bang> <args>
-command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind call s:libEdit(<f-args>)
+command! -nargs=1 -bang -complete=customlist,s:mainFind Afind call s:edit(<f-args>, s:getProjectRoot())
+command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind call s:edit(<f-args>, s:getTestDir())
+command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind call s:edit(<f-args>, s:getLibDir())
 
 command! -nargs=1 -bang -complete=customlist,s:mainFind AVfind vsplit <args>
 command! -nargs=1 -bang -complete=customlist,s:testFind AVtestfind vsplit <args>
