@@ -86,6 +86,10 @@ function! s:isTestDirectory(directory)
     return 0
   endif
 endfunction
+
+function! s:getPath(root)
+  return a:root.','.a:root.'/src/**/*,'.a:root.'/res/**/*'
+endfunction
 " }}}
 " {{{ External Commands (android, ant, etc.)
 function! s:callAndroid(...)
@@ -199,7 +203,7 @@ function! s:libFind(argLead, cmdLine, cursorPos)
 endfunction
 
 function! s:find(argLead, cmdLine, cursorPos, root)
-  let path = a:root.','.a:root.'/src/**/*,'.a:root.'/res/**/*'
+  let path = s:getPath(a:root)
 
   let ignore_exts = ['png', 'jpg', 'gif', 'ico', 'db', 'apk']
 
@@ -219,47 +223,53 @@ function! s:find(argLead, cmdLine, cursorPos, root)
   return files
 endfunction
 
-" Find a file in any referenced library projects. If multiple
-" files match the name provided the user will be prompted to
-" choose which file to open.
-function! s:edit(file, dir)
+" Edit a file in given directory or list of directories (or subdirectory
+" therein). If multiple files match the name provided the user will be
+" prompted to choose which file to open.
+function! s:edit(file, dir, cmd)
   let files = []
 
   if type(a:dir) == 3 " dir is a list
     for d in a:dir
-      call extend(files, findfile(a:file, d . '/**/*', -1))
+      let path = s:getPath(d)
+      call extend(files, findfile(a:file, path, -1))
     endfor
   else
-    let files = findfile(a:file, a:dir . '/**/*', -1)
+    let path = s:getPath(a:dir)
+    let files = findfile(a:file, path, -1)
   endif
 
-  if len(files) == 1
-    execute 'edit ' . files[0]
+  let length = len(files)
+
+  if length == 0
+    echo 'No file was found'
+  elseif length == 1
+    execute a:cmd . ' ' . files[0]
   else
     " Multiple files match. Prompt for file to use.
     let choice = inputlist(map(copy(files), 'index(files, v:val) + 1.". ".v:val'))
     if choice != ''
-      execute 'edit ' . files[choice - 1]
+      execute a:cmd . ' ' . files[choice - 1]
     endif
   endif
 endfunction
 " }}}
 
-command! -nargs=1 -bang -complete=customlist,s:mainFind Afind call s:edit(<f-args>, s:getProjectRoot())
-command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind call s:edit(<f-args>, s:getTestDir())
-command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind call s:edit(<f-args>, s:getLibDir())
+command! -nargs=1 -bang -complete=customlist,s:mainFind Afind     call s:edit(<f-args>, s:getProjectRoot(), 'edit')
+command! -nargs=1 -bang -complete=customlist,s:testFind Atestfind call s:edit(<f-args>, s:getTestDir(), 'edit')
+command! -nargs=1 -bang -complete=customlist,s:libFind Alibfind   call s:edit(<f-args>, s:getLibDir(), 'edit')
 
-command! -nargs=1 -bang -complete=customlist,s:mainFind AVfind vsplit <args>
-command! -nargs=1 -bang -complete=customlist,s:testFind AVtestfind vsplit <args>
-command! -nargs=1 -bang -complete=customlist,s:libFind AVlibfind vsplit <args>
+command! -nargs=1 -bang -complete=customlist,s:mainFind AVfind     call s:edit(<f-args>, s:getProjectRoot(), 'vsplit')
+command! -nargs=1 -bang -complete=customlist,s:testFind AVtestfind call s:edit(<f-args>, s:getTestDir(), 'vsplit')
+command! -nargs=1 -bang -complete=customlist,s:libFind AVlibfind   call s:edit(<f-args>, s:getLibDir(), 'vsplit')
 
-command! -nargs=1 -bang -complete=customlist,s:mainFind ASfind split <args>
-command! -nargs=1 -bang -complete=customlist,s:testFind AStestfind split <args>
-command! -nargs=1 -bang -complete=customlist,s:libFind ASlibfind split <args>
+command! -nargs=1 -bang -complete=customlist,s:mainFind ASfind     call s:edit(<f-args>, s:getProjectRoot(), 'split')
+command! -nargs=1 -bang -complete=customlist,s:testFind AStestfind call s:edit(<f-args>, s:getTestDir(), 'split')
+command! -nargs=1 -bang -complete=customlist,s:libFind ASlibfind   call s:edit(<f-args>, s:getLibDir(), 'split')
 
-command! -nargs=1 -bang -complete=customlist,s:mainFind ATfind tabedit <args>
-command! -nargs=1 -bang -complete=customlist,s:testFind ATtestfind tabedit <args>
-command! -nargs=1 -bang -complete=customlist,s:libFind ATlibfind tabedit <args>
+command! -nargs=1 -bang -complete=customlist,s:mainFind ATfind     call s:edit (<f-args>, s:getProjectRoot(), 'tabedit')
+command! -nargs=1 -bang -complete=customlist,s:testFind ATtestfind call s:edit (<f-args>, s:getTestDir(), 'tabedit')
+command! -nargs=1 -bang -complete=customlist,s:libFind ATlibfind   call s:edit (<f-args>, s:getLibDir(), 'tabedit')
 
 command! Adebug call s:callAnt('debug')
 command! Arelease call s:callAnt('release')
