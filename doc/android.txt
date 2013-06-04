@@ -38,8 +38,11 @@ Areleasei                 Build and install the release APK.
                           Equivalent to calling `ant release install`
 
                                                  *:Aclean*
-Aclean                    Clean the project.
-                          Equivalent to calling `ant clean`
+Aclean [++args]           Clean the project.
+                          Equivalent to calling `ant clean`. [++args] can be
+                          any additional ant commands/arguments you want to
+                          specify.
+                            :Aclean -f test_project/build.xml
 
                                                  *:Atest*
 Atest                     Run the unit tests for the current project.
