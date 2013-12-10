@@ -51,8 +51,8 @@ sub-directories of your ~/.vim directory.
 Contributing
 ------------
 
-If you are interesting in contributing to android.vim please ensure your
-commits follow a few simple guidelines.
+If you are interested in contributing to android.vim, please ensure your
+commits follow a few simple guidelines:
 
 - Avoid trailing whitespace.
 - Format commit messages in the imperative present tense.
